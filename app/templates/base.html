@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Уязвимая гостевая книга</title>
+  <style>
+    body { font-family: sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    nav a { margin-right: 10px; }
+    .comment { border-bottom: 1px solid #ddd; padding: 8px 0; }
+    input, textarea { display: block; margin: 6px 0; width: 100%; box-sizing: border-box; }
+    .err { color: #c00; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{{ url_for('index') }}">Главная</a>
+    <a href="{{ url_for('search') }}">Поиск</a>
+    {% if session.user %}
+      <a href="{{ url_for('profile') }}">{{ session.user }}</a>
+      <a href="{{ url_for('account') }}">Кабинет</a>
+      <a href="{{ url_for('logout') }}">Выход</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Вход</a>
+    {% endif %}
+  </nav>
+  <hr>
+  {% block content %}{% endblock %}
+</body>
+</html>

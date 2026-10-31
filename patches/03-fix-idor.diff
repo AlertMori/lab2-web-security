@@ -1,0 +1,30 @@
+diff --git a/app/app.py b/app/app.py
+index 1c3821a..7611821 100644
+--- a/app/app.py
++++ b/app/app.py
+@@ -98,18 +98,16 @@ def profile():
+ 
+ @app.route("/account")
+ def account():
+-    # VULN 3 (IDOR / Broken Access Control, A01:2021): идентификатор аккаунта
+-    # берётся прямо из параметра запроса ?id=, принадлежность пользователю
+-    # не проверяется. Запрос к БД параметризован (SQLi здесь нет) — проблема
+-    # именно в отсутствии контроля доступа: подставив чужой id, можно
+-    # прочитать секрет любого аккаунта, и даже без входа в систему.
+-    uid = request.args.get("id", "1")
++    # FIX: личность пользователя берётся из серверной сессии, а не из
++    # параметра запроса. Требуется вход, и показывается только собственный
++    # аккаунт — подставить чужой id в URL уже нельзя.
++    if "user" not in session:
++        return redirect(url_for("login"))
+     db = get_db()
+     row = db.execute(
+-        "SELECT username, secret FROM users WHERE id = ?", (uid,)
++        "SELECT username, secret FROM users WHERE username = ?",
++        (session["user"],)
+     ).fetchone()
+-    if row is None:
+-        return "Аккаунт не найден", 404
+     return render_template("account.html", acc=row)
+ 
+ 

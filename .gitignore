@@ -1,0 +1,3 @@
+app/lab.db
+__pycache__/
+*.pyc

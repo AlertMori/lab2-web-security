@@ -1,0 +1,37 @@
+diff --git a/app/app.py b/app/app.py
+index 1fa4245..59f8b56 100644
+--- a/app/app.py
++++ b/app/app.py
+@@ -49,12 +49,10 @@ def login():
+         username = request.form.get("username", "")
+         password = request.form.get("password", "")
+         db = get_db()
+-        # VULN 1 (SQL Injection): пользовательский ввод подставляется в SQL
+-        # напрямую через форматирование строки. Можно обойти аутентификацию
+-        # payload-ом  admin' --
+-        query = ("SELECT * FROM users WHERE username = '%s' AND password = '%s'"
+-                 % (username, password))
+-        row = db.execute(query).fetchone()
++        # FIX: параметризованный запрос — значения передаются отдельно от
++        # текста SQL (placeholders ?), поэтому кавычки во вводе не ломают запрос.
++        query = "SELECT * FROM users WHERE username = ? AND password = ?"
++        row = db.execute(query, (username, password)).fetchone()
+         if row:
+             session["user"] = row["username"]
+             return redirect(url_for("profile"))
+@@ -68,11 +66,10 @@ def search():
+     results = []
+     if q:
+         db = get_db()
+-        # VULN 1 (SQL Injection): та же проблема в поиске по авторам.
+-        # Через UNION SELECT можно выгрузить логины и пароли из таблицы users.
+-        query = ("SELECT author, body FROM comments WHERE author LIKE '%%%s%%'"
+-                 % q)
+-        results = db.execute(query).fetchall()
++        # FIX: параметризованный запрос; шаблон LIKE формируется отдельно и
++        # передаётся как значение, а не как часть текста SQL.
++        query = "SELECT author, body FROM comments WHERE author LIKE ?"
++        results = db.execute(query, ("%" + q + "%",)).fetchall()
+     return render_template("search.html", results=results, q=q)
+ 
+ 

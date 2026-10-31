@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Поиск по авторам</h1>
+<form method="get">
+  <input name="q" value="{{ q }}" placeholder="Имя автора">
+  <button type="submit">Искать</button>
+</form>
+<hr>
+{% for r in results %}
+  <div class="comment"><b>{{ r.author }}</b>: {{ r.body }}</div>
+{% else %}
+  {% if q %}<p>Ничего не найдено.</p>{% endif %}
+{% endfor %}
+{% endblock %}

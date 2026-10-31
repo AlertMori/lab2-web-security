@@ -1,0 +1,17 @@
+diff --git a/app/templates/index.html b/app/templates/index.html
+index 49f4da4..886bbc7 100644
+--- a/app/templates/index.html
++++ b/app/templates/index.html
+@@ -13,9 +13,9 @@
+ {% for c in comments %}
+   <div class="comment">
+     <b>{{ c.author }}</b>:
+-    {# VULN 2 (Stored XSS): тело комментария выводится фильтром | safe,     #}
+-    {# то есть без экранирования. Любой <script> из БД выполнится в браузере. #}
+-    {{ c.body | safe }}
++    {# FIX: убираем | safe. Jinja2 по умолчанию экранирует вывод, поэтому  #}
++    {# <script> превратится в текст &lt;script&gt; и не выполнится.         #}
++    {{ c.body }}
+   </div>
+ {% endfor %}
+ {% endblock %}
